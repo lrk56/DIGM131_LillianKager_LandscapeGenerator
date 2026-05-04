@@ -15,19 +15,25 @@ and snowcover without touching the creation logic.
 ## Project Structure
 ```
 LandscapeGenerator/
-    filename.py            # add file here
-    filename.py            # add file here
+    tree_geometry.py       # create_trunk, create_branches, create_leaves, create_roots 
+    tree_materials.py      # create_material, assign_material
     main.py                # Entry point, config, build_landscape()
     README.md              # This file
 ```
 
 ## Functions
-### filename1.py
-- `function1(param1, param2)` — It does xyz
-- `function2(param1, param2)` — It does xyz
-### filename2.py
-- `function1(param1, param2)` — It does xyz
-- `function2(param1, param2)` — It does xyz
+### tree_geometry.py
+- `create_trunk(width, height)` — It creates the trunk of a tree. 
+- `create_branches(count, spread)` — Generates branch structures relative to the trunk.
+- `create_leaves(density, style)` — Populates the branches with foliage geometry.
+- `create_roots(depth, radius)` — Generates above-ground root structures.
+
+### tree_materials.py
+- `create_material(color, texture_path)` — Defines a new shader or material for tree parts.
+- `assign_material(object, material)` — Maps specific materials to trunk or leaf geometry.
+
+### main.py
+- `build_landscape()` — The primary loop that coordinates geometry and material functions to generate the scene.
 
 ## How to Run 
 1. Open Maya
