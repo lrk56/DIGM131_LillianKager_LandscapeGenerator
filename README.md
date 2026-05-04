@@ -41,5 +41,5 @@ LandscapeGenerator/
 3. Source `main.py` from the LandscapeGenerator folder
 
 ## Author
-Lillian Kager | DIGM 131 | Drexel University
+Lillian Kager | lrk56 | DIGM 131 | Drexel University
 
