@@ -17,6 +17,8 @@ and snowcover without touching the creation logic.
 LandscapeGenerator/
     tree_geometry.py       # create_trunk, create_branches, create_leaves, create_roots 
     tree_materials.py      # create_material, assign_material
+    perlin_terrain.py      # ...
+    terrain_materials.py   # create_material, assign_material 
     main.py                # Entry point, config, build_landscape()
     README.md              # This file
 ```
@@ -31,6 +33,11 @@ LandscapeGenerator/
 ### tree_materials.py
 - `create_material(color, texture_path)` — Defines a new shader or material for tree parts.
 - `assign_material(object, material)` — Maps specific materials to trunk or leaf geometry.
+
+### perlin_terrain.py 
+- add
+### terrain_materials.py
+- add
 
 ### main.py
 - `build_landscape()` — The primary loop that coordinates geometry and material functions to generate the scene.
