@@ -23,21 +23,6 @@ LandscapeGenerator/
     README.md              # This file
 ```
 
-## Functions
-### tree_geometry.py
-- `create_trunk(width, height)` — It creates the trunk of a tree. 
-- `create_branches(count, spread)` — Generates branch structures relative to the trunk.
-- `create_leaves(density, style)` — Populates the branches with foliage geometry.
-- `create_roots(depth, radius)` — Generates above-ground root structures.
-
-## DIGM131_LillianKager_LandscapeGenerator
-
-This repository contains a small set of helper modules that generate a stylized landscape inside Autodesk Maya. The code builds a terrain mesh displaced with Perlin-style fractal noise, plus a couple of tree types (oak and pine). Materials are created and assigned with helper utilities.
-
-This README documents every public function in the project, their parameters and return values, basic usage, and troubleshooting notes so you can run and extend the tool inside Maya.
-
----
-
 ## Quick start (inside Maya)
 
 1. Open Autodesk Maya.
@@ -51,19 +36,19 @@ from main import build_landscape
 scene = build_landscape()
 ```
 
-The function returns a dictionary describing created scene nodes.
+The function returns a dictionary describing the created scene nodes.
 
 ---
 
 ## Project layout (files and purpose)
 
 - `main.py` — entry point and scene builder (calls geometry and material helpers to create a test scene).
-- `terrain_generator.py` — helper that creates a subdivided plane and displaces vertices with fractal Perlin noise.
+- `terrain_generator.py` - helper that creates a subdivided plane and displaces vertices with fractal Perlin noise.
 - `demo_perlin.py` — a small Perlin-like noise implementation used by the terrain generator.
-- `terrain_materials.py` — terrain shader presets (grass, sand, stone) and helper to assign them.
+- `terrain_materials.py` — terrain shader presets and helper to assign them.
 - `oak_tree_geometry.py` — builders for oak-style tree geometry: trunk, branches, leaves, base.
-- `pine_tree_geometry.py` — builders for pine-style tree geometry: trunk, stacked foliage cones, base.
-- `tree_materials.py` — simple lambert shader creation and assignment helpers for tree parts.
+- `pine_tree_geometry.py` —builders for pine-style tree geometry: trunk, stacked foliage cones, base.
+- `tree_materials.py` — a simple lambert shader creation and assignment helpers for tree parts.
 
 ---
 
@@ -89,8 +74,6 @@ The function returns a dictionary describing created scene nodes.
         - seed (int): Random seed used by the `PerlinNoise` instance for deterministic results.
         - name (str): Name for the created plane transform.
     - Returns: The transform node name of the created plane (string).
-
-Notes: The function uses `cmds.polyEvaluate(..., vertex=True)` and iterates every vertex to call `cmds.pointPosition` and `cmds.xform` to displace vertices.
 
 ### terrain_materials.py
 
