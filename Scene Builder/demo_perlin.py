@@ -3,7 +3,7 @@ import math
 import random
 
 
-#--- Simple value noise (Perlin-like) ---
+# --- Simple value noise (Perlin-like) ---
 def fade(t):
     return t * t * t * (t * (t * 6 - 15) + 10)
 
@@ -12,7 +12,7 @@ def lerp(a, b, t):
     return a + t * (b - a)
 
 
-#Grid-based gradient noise
+# Grid-based gradient noise
 class PerlinNoise:
     def __init__(self, seed=0):
         random.seed(seed)
@@ -48,13 +48,13 @@ class PerlinNoise:
         return total
 
 
-#Settings
+# Settings
 subdivs = 50
 plane_size = 20
 noise_scale = 0.15  # controls feature size (lower = broader hills)
 height_scale = 5.0  # max displacement height
 
-#Create the plane
+# Create the plane
 terrain = cmds.polyPlane(
     w=plane_size, h=plane_size,
     sx=subdivs, sy=subdivs,
@@ -63,7 +63,7 @@ terrain = cmds.polyPlane(
 
 perlin = PerlinNoise(seed=42)
 
-#Displace each vertex along Y
+# Displace each vertex along Y
 num_verts = cmds.polyEvaluate(terrain, vertex=True)
 for i in range(num_verts):
     vtx = '{}.vtx[{}]'.format(terrain, i)

@@ -7,15 +7,15 @@ and snowcover without touching the creation logic.
 
 ## Planned Features
 - [x] Core geometry functions (Week 6)
-- [x] Data-driven configuration (Week 7)
-- [x] Error handling + debug mode (Week 8)
+- [ ] Data-driven configuration (Week 7)
+- [ ] Error handling + debug mode (Week 8)
 - [ ] Maya UI window + JSON save/load (Week 9)
 - [ ] Polish + documentation (Week 10)
 
 ## Project Structure
 ```
 LandscapeGenerator/
-    tree_geometry.py       # create_trunk, create_leaves, create_roots 
+    tree_geometry.py       # create_trunk, create_branches, create_leaves, create_roots 
     tree_materials.py      # create_material, assign_material
     perlin_terrain.py      # ...
     terrain_materials.py   # create_material, assign_material 
@@ -26,7 +26,8 @@ LandscapeGenerator/
 ## Functions
 ### tree_geometry.py
 - `create_trunk(width, height)` — It creates the trunk of a tree. 
--- `create_leaves(density, style)` — Populates the foliage canopy with geometry.
+- `create_branches(count, spread)` — Generates branch structures relative to the trunk.
+- `create_leaves(density, style)` — Populates the branches with foliage geometry.
 - `create_roots(depth, radius)` — Generates above-ground root structures.
 
 ## DIGM131_LillianKager_LandscapeGenerator
@@ -60,7 +61,7 @@ The function returns a dictionary describing created scene nodes.
 - `terrain_generator.py` — helper that creates a subdivided plane and displaces vertices with fractal Perlin noise.
 - `demo_perlin.py` — a small Perlin-like noise implementation used by the terrain generator.
 - `terrain_materials.py` — terrain shader presets (grass, sand, stone) and helper to assign them.
-- `oak_tree_geometry.py` — builders for oak-style tree geometry: trunk, leaves, base.
+- `oak_tree_geometry.py` — builders for oak-style tree geometry: trunk, branches, leaves, base.
 - `pine_tree_geometry.py` — builders for pine-style tree geometry: trunk, stacked foliage cones, base.
 - `tree_materials.py` — simple lambert shader creation and assignment helpers for tree parts.
 
@@ -71,14 +72,7 @@ The function returns a dictionary describing created scene nodes.
 - build_landscape()
     - Coordinates terrain and tree creation to produce a simple test scene.
     - Returns: dict with keys `terrain`, `oak`, `pine`. `terrain` is the terrain transform name. `oak` and `pine` are nested dicts describing created parts.
-    - Behavior: Creates a terrain (via `terrain_generator.create_terrain`), an oak tree (trunk, leaves, base), and a pine tree (trunk, stacked foliage cones, base). Assigns materials using the material helpers.
-
-### How it works (data-driven)
-
-- SCENE_CONFIG (in `main.py`) is a list of dictionaries describing scene elements. Each dictionary must include a `type` key (e.g. `"terrain"`, `"oak"`, `"pine"`) and any parameters to pass to that element's builder (these parameters match the builder function signatures).
-- `BUILDERS` is a dictionary mapping the `type` string to a builder callable. `create_element(data)` looks up the builder by `data['type']`, strips the `type` key, and calls the builder using `**params`.
-- `create_element` validates the input, warns on missing or unknown types, and returns `None` on failure. Builders are wrapped defensively so they return `None` instead of raising when Maya is unavailable or parameters are bad.
-- `build_scene()` iterates `SCENE_CONFIG`, calls `create_element()` for each entry, and returns a list of results. Adding an object to the scene is just adding a dictionary to `SCENE_CONFIG` — no code changes required.
+    - Behavior: Creates a terrain (via `terrain_generator.create_terrain`), an oak tree (trunk, branches, leaves, base), and a pine tree (trunk, stacked foliage cones, base). Assigns materials using the material helpers.
 
 ### terrain_generator.py
 
@@ -118,16 +112,24 @@ Notes: The function uses `cmds.polyEvaluate(..., vertex=True)` and iterates ever
 
 ### oak_tree_geometry.py
 
-create_trunk(width=1, height=5) -> str
+- create_trunk(width=1, height=5) -> str
     - Builds a `polyCylinder`, moves it to sit on the ground (translates by height/2) and returns its transform name.
     - Parameters:
         - width (float): Diameter of the trunk.
         - height (float): Height of the trunk.
 
-create_leaves(density=20, style='round', spread=2.5, trunk_height=5) -> list[str]
-    - Creates `density` poly spheres or small mesh clusters scattered around the treetop to emulate a leafy canopy.
+- create_branches(count=5, spread=3, trunk_height=5) -> list[str]
+    - Creates `count` short cylinders rotated and moved to simulate branches fanning out from the top of the trunk.
     - Parameters:
-        - density (int): Number of leaf elements.
+        - count (int): Number of branches to create.
+        - spread (float): Length/height of each branch cylinder.
+        - trunk_height (float): Y position to place the branches (usually trunk height).
+    - Returns: List of branch transform node names.
+
+- create_leaves(density=20, style='round', spread=2.5, trunk_height=5) -> list[str]
+    - Creates `density` poly spheres scattered around treetop to emulate a leafy canopy.
+    - Parameters:
+        - density (int): Number of leaf spheres.
         - style (str): `'round'` (default) or `'pointy'` — the latter scales spheres vertically to appear pointier.
         - spread (float): Scatter radius for foliage placement.
         - trunk_height (float): Base Y position for foliage.

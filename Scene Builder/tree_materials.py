@@ -59,11 +59,3 @@ def assign_material(obj, material):
         cmds.sets(obj, edit=True, forceElement=shading_group)
 
     return shading_group
-
-
-if __name__ == "__main__":
-    try:
-        mat = create_material((0.13, 0.45, 0.1))
-        print('tree material created:', mat)
-    except Exception as e:
-        print('tree_materials test could not run:', e)

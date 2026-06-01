@@ -1,13 +1,10 @@
 """oak_tree_geometry.py
 Utility module for generating a stylized oak tree in Autodesk Maya.
-Contains builder functions for trunk, foliage, and base geometry.
+Contains builder functions for trunk, branches, foliage, and base geometry.
 """
 from maya import cmds
 import random
 import math
-
-#DEBUG flag - when True builder functions will print parameters and errors
-DEBUG = False
 
 
 def create_trunk(width=1, height=5):
@@ -21,24 +18,35 @@ def create_trunk(width=1, height=5):
     Returns:
         str: Name of the created trunk transform node.
     """
-    #input validation
-    if width <= 0:
-        if DEBUG: print('create_trunk: invalid width, using default 1')
-        width = 1
-    if height <= 0:
-        if DEBUG: print('create_trunk: invalid height, using default 5')
-        height = 5
+    trunk = cmds.polyCylinder(h=height, r=width/2, sx=8, sy=1, sz=1)[0]
+    #move trunk so it sits on the ground
+    cmds.move(0, height/2, 0, trunk)
+    return trunk
 
-    try:
-        trunk = cmds.polyCylinder(h=height, r=width/2, sx=8, sy=1, sz=1)[0]
-        #move trunk so it sits on the ground
-        cmds.move(0, height/2, 0, trunk)
-        return trunk
-    except Exception as e:
-        if DEBUG: print('create_trunk failed:', e)
-        return None
+def create_branches(count=5, spread=3, trunk_height=5):
+    """
+    Generates branch cylinders fanned outward from the top of the trunk.
 
-#oak uses foliage spheres (no branch primitives)
+    Arguments:
+        count (int): Number of branches to generate. Defaults to 5.
+        spread (float): Length of each branch. Defaults to 3.
+        trunk_height (float): Y position of the trunk top to attach branches. Defaults to 5.
+    Returns:
+        list[str]: List of branch transform node names.
+    """
+    branches = []
+    for i in range(count):
+        angle = (360.0 / count) * i
+        branch = cmds.polyCylinder(h=spread, r=0.1, sx=8, sy=1, sz=1)[0]
+        #rotate around Y first so each branch faces outward at its angle
+        cmds.xform(branch, ro=(0, angle, -60), ws=True)
+
+        #place at top of trunk offset outward slightly
+        rad = math.radians(angle)
+        cmds.move(math.sin(rad) * 0.3, trunk_height, math.cos(rad) * 0.3, branch)
+
+        branches.append(branch)
+    return branches
 
 def create_leaves(density=20, style='round', spread=2.5, trunk_height=5):
     """
@@ -53,27 +61,20 @@ def create_leaves(density=20, style='round', spread=2.5, trunk_height=5):
         list[str]: List of leaf sphere transform node names.
     """
     leaves = []
-    if density <= 0:
-        if DEBUG: print('create_leaves: invalid density, using default 20')
-        density = 20
-    try:
-        for i in range(density):
-            r = random.uniform(0.8, 1.5)
-            leaf = cmds.polySphere(r=r, sx=8, sy=8)[0]
-            #scatter leaf spheres in a canopy above the trunk
-            x = random.uniform(-spread, spread)
-            z = random.uniform(-spread, spread)
-            y = trunk_height + random.uniform(0, spread * 0.8)
-            cmds.move(x, y, z, leaf)
+    for i in range(density):
+        r = random.uniform(0.8, 1.5)
+        leaf = cmds.polySphere(r=r, sx=8, sy=8)[0]
+        #scatter leaf spheres in a canopy above the trunk
+        x = random.uniform(-spread, spread)
+        z = random.uniform(-spread, spread)
+        y = trunk_height + random.uniform(0, spread * 0.8)
+        cmds.move(x, y, z, leaf)
 
-            if style == 'pointy':
-                cmds.scale(0.5, 1.5, 0.5, leaf)
+        if style == 'pointy':
+            cmds.scale(0.5, 1.5, 0.5, leaf)
 
-            leaves.append(leaf)
-        return leaves
-    except Exception as e:
-        if DEBUG: print('create_leaves failed:', e)
-        return []
+        leaves.append(leaf)
+    return leaves
 
 
 def create_base(depth=1.5, radius=1.8):
@@ -91,14 +92,3 @@ def create_base(depth=1.5, radius=1.8):
     #small cone to sit under the trunk
     cmds.move(0, depth/2, 0, base)
     return base
-
-
-if __name__ == "__main__":
-    #quick test when run directly (requires Maya)
-    try:
-        t = create_trunk()
-        leaves = create_leaves()
-        print('oak trunk:', t)
-        print('oak leaves count:', len(leaves))
-    except Exception as e:
-        print('oak_tree_geometry test could not run (Maya may be unavailable):', e)

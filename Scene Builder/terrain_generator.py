@@ -13,9 +13,6 @@ sys.path.insert(0, os.path.dirname(__file__))
 import maya.cmds as cmds
 from demo_perlin import PerlinNoise
 
-#DEBUG flag - when True, builder functions will print parameters and errors
-DEBUG = False
-
 
 def create_terrain(
     plane_size=20,
@@ -45,50 +42,29 @@ def create_terrain(
     Returns:
         str: Name of the created terrain transform node.
     """
-    #input validation
-    if plane_size <= 0:
-        if DEBUG: print('create_terrain: invalid plane_size, using default 20')
-        plane_size = 20
-    if subdivs <= 0:
-        if DEBUG: print('create_terrain: invalid subdivs, using default 50')
-        subdivs = 50
-
-    try:
     #create the base plane
-        terrain = cmds.polyPlane(
-            w=plane_size, h=plane_size,
-            sx=subdivs, sy=subdivs,
-            name=name
-        )[0]
+    terrain = cmds.polyPlane(
+        w=plane_size, h=plane_size,
+        sx=subdivs, sy=subdivs,
+        name=name
+    )[0]
 
     #make perlin instance for displacement
-        perlin = PerlinNoise(seed=seed)
+    perlin = PerlinNoise(seed=seed)
 
-    #displace each vertex along Y using fractal noise, one by one
-        num_verts = cmds.polyEvaluate(terrain, vertex=True)
-        for i in range(num_verts):
-            vtx = '{}.vtx[{}]'.format(terrain, i)
-            pos = cmds.pointPosition(vtx, world=True)
-            h = perlin.fractal(
-                pos[0] * noise_scale,
-                pos[2] * noise_scale,
-                octaves=octaves,
-                persistence=persistence,
-                lacunarity=lacunarity
-            )
-            #move vertex up by noise value scaled to height_scale
-            cmds.xform(vtx, worldSpace=True, translation=[pos[0], h * height_scale, pos[2]])
+    #displace each vertex along Y using fractal noise,one by one
+    num_verts = cmds.polyEvaluate(terrain, vertex=True)
+    for i in range(num_verts):
+        vtx = '{}.vtx[{}]'.format(terrain, i)
+        pos = cmds.pointPosition(vtx, world=True)
+        h = perlin.fractal(
+            pos[0] * noise_scale,
+            pos[2] * noise_scale,
+            octaves=octaves,
+            persistence=persistence,
+            lacunarity=lacunarity
+        )
+        #move vertex up by noise value scaled to height_scale
+        cmds.xform(vtx, worldSpace=True, translation=[pos[0], h * height_scale, pos[2]])
 
-        return terrain
-    except Exception as e:
-        if DEBUG:
-            print('create_terrain failed:', e)
-        return None
-
-
-if __name__ == "__main__":
-    try:
-        t = create_terrain(plane_size=4, subdivs=8, height_scale=1.0, noise_scale=0.2, seed=1, name='test_terrain')
-        print('terrain created:', t)
-    except Exception as e:
-        print('terrain_generator test could not run:', e)
+    return terrain
