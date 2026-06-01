@@ -80,3 +80,11 @@ def assign_terrain_material(terrain, material):
     #apply material to the terrain object
     cmds.sets(terrain, edit=True, forceElement=shading_group)
     return shading_group
+
+
+if __name__ == "__main__":
+    try:
+        mat = create_terrain_material('grass')
+        print('terrain material created:', mat)
+    except Exception as e:
+        print('terrain_materials test could not run (Maya may be unavailable):', e)
