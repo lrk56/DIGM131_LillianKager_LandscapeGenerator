@@ -11,6 +11,8 @@ def create_rock(radius=None, position=(0, 0, 0):
   Args:
     radius (float):    radius of the rock
     position (tuple):  (x, y, z) coordinates of the rock
+
+  Return: returns the node named rock
   """
   #creates the rock
   rock = cmds.polysphere(radius=radius, name="rock_#")[0]
