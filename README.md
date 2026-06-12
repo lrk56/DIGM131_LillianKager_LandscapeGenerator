@@ -175,15 +175,11 @@ create_leaves(density=20, style='round', spread=2.5, trunk_height=5) -> list[str
 
 ## What I Learned
 
-Before this class, I had never used Maya and had never done any Python scripting for digital content creation. Coming into the project, I was familiar with Python from my computer science courses, but applying it to create and manipulate 3D objects was completely new to me.
+Before this class, I had never used Maya or done any Python scripting for digital content creation, so there was definitely a learning curve. The hardest part of the project was figuring out how Maya's commands worked and understanding how to create and manipulate geometry through code instead of through the Maya interface. I spent a lot of time debugging issues related to object creation, positioning, and material assignment while learning the Maya API.
 
-One thing I learned was how useful it is to break a project into multiple separate modules. As my generator grew, keeping terrain generation, tree geometry, materials, and scene-building logic in different files made the code much easier to understand and work with. It also made it easier to add new features without having to rewrite existing code.
+One thing I learned is that good project organization becomes much more important as a program grows. Separating the terrain, tree geometry, materials, and scene-building logic into different modules made the code much easier to maintain and expand. I also gained experience with procedural generation and learned how parameters and noise functions can be used to create more natural-looking landscapes.
 
-I also learned about procedural generation and how relatively simple mathematical concepts can be used to create more natural looking environments. Experimenting with terrain noise and different parameters also helped me understand how small changes can have a big impact on the final result.
-
-Another thing that I gained experience with was debugging in a very new environment. Maya scripting works so differently than the programming assignments I am used to, so I spent a lot of time learning how Maya commands work, how to troubleshoot errors, and how to make my code more reliable through validation and error handling.
-
-Overall, this project gave me a good introduction to using programming as a creative tool. It combined concepts I already knew from computer science with a completely new application area, and it helped me become more comfortable working with both Maya and procedural content generation.
+If I continued working on this project, I could improve the user experience by adding a full Maya UI and support for saving and loading configurations through JSON files. I would also add more landscape features, such as additional tree types, rocks, water, and other environmental objects to make the generated scenes feel more varied and realistic. Overall, the project gave me a good introduction to Maya scripting and showed me how programming can be used as a tool for creating digital content.
 
 ## Author
 
