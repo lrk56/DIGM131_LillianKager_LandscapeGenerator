@@ -9,8 +9,8 @@ and snowcover without touching the creation logic.
 - [x] Core geometry functions (Week 6)
 - [x] Data-driven configuration (Week 7)
 - [x] Error handling + debug mode (Week 8)
-- [ ] Maya UI window + JSON save/load (Week 9)
-- [ ] Polish + documentation (Week 10)
+- [x] Maya UI window + JSON save/load (Week 9)
+- [x] Polish + documentation (Week 10)
 
 ## Project Structure
 ```
@@ -172,6 +172,18 @@ create_leaves(density=20, style='round', spread=2.5, trunk_height=5) -> list[str
     - Returns: Shading group node name used for the assignment.
 
 ---
+
+## What I Learned
+
+Before this class, I had never used Maya and had never done any Python scripting for digital content creation. Coming into the project, I was familiar with Python from my computer science courses, but applying it to create and manipulate 3D objects was completely new to me.
+
+One thing I learned was how useful it is to break a project into multiple separate modules. As my generator grew, keeping terrain generation, tree geometry, materials, and scene-building logic in different files made the code much easier to understand and work with. It also made it easier to add new features without having to rewrite existing code.
+
+I also learned about procedural generation and how relatively simple mathematical concepts can be used to create more natural looking environments. Experimenting with terrain noise and different parameters also helped me understand how small changes can have a big impact on the final result.
+
+Another thing that I gained experience with was debugging in a very new environment. Maya scripting works so differently than the programming assignments I am used to, so I spent a lot of time learning how Maya commands work, how to troubleshoot errors, and how to make my code more reliable through validation and error handling.
+
+Overall, this project gave me a good introduction to using programming as a creative tool. It combined concepts I already knew from computer science with a completely new application area, and it helped me become more comfortable working with both Maya and procedural content generation.
 
 ## Author
 
