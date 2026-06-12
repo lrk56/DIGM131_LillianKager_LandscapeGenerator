@@ -7,21 +7,35 @@ and snowcover without touching the creation logic.
 
 ## Planned Features
 - [x] Core geometry functions (Week 6)
-- [ ] Data-driven configuration (Week 7)
-- [ ] Error handling + debug mode (Week 8)
-- [ ] Maya UI window + JSON save/load (Week 9)
-- [ ] Polish + documentation (Week 10)
+- [x] Data-driven configuration (Week 7)
+- [x] Error handling + debug mode (Week 8)
+- [x] Maya UI window + JSON save/load (Week 9)
+- [x] Polish + documentation (Week 10)
 
 ## Project Structure
 ```
 LandscapeGenerator/
-    tree_geometry.py       # create_trunk, create_branches, create_leaves, create_roots 
+    tree_geometry.py       # create_trunk, create_leaves, create_roots 
     tree_materials.py      # create_material, assign_material
     perlin_terrain.py      # ...
     terrain_materials.py   # create_material, assign_material 
     main.py                # Entry point, config, build_landscape()
     README.md              # This file
 ```
+
+## Functions
+### tree_geometry.py
+- `create_trunk(width, height)` — It creates the trunk of a tree. 
+-- `create_leaves(density, style)` — Populates the foliage canopy with geometry.
+- `create_roots(depth, radius)` — Generates above-ground root structures.
+
+## DIGM131_LillianKager_LandscapeGenerator
+
+This repository contains a small set of helper modules that generate a stylized landscape inside Autodesk Maya. The code builds a terrain mesh displaced with Perlin-style fractal noise, plus a couple of tree types (oak and pine). Materials are created and assigned with helper utilities.
+
+This README documents every public function in the project, their parameters and return values, basic usage, and troubleshooting notes so you can run and extend the tool inside Maya.
+
+---
 
 ## Quick start (inside Maya)
 
@@ -36,19 +50,19 @@ from main import build_landscape
 scene = build_landscape()
 ```
 
-The function returns a dictionary describing the created scene nodes.
+The function returns a dictionary describing created scene nodes.
 
 ---
 
 ## Project layout (files and purpose)
 
 - `main.py` — entry point and scene builder (calls geometry and material helpers to create a test scene).
-- `terrain_generator.py` - helper that creates a subdivided plane and displaces vertices with fractal Perlin noise.
+- `terrain_generator.py` — helper that creates a subdivided plane and displaces vertices with fractal Perlin noise.
 - `demo_perlin.py` — a small Perlin-like noise implementation used by the terrain generator.
-- `terrain_materials.py` — terrain shader presets and helper to assign them.
-- `oak_tree_geometry.py` — builders for oak-style tree geometry: trunk, branches, leaves, base.
-- `pine_tree_geometry.py` —builders for pine-style tree geometry: trunk, stacked foliage cones, base.
-- `tree_materials.py` — a simple lambert shader creation and assignment helpers for tree parts.
+- `terrain_materials.py` — terrain shader presets (grass, sand, stone) and helper to assign them.
+- `oak_tree_geometry.py` — builders for oak-style tree geometry: trunk, leaves, base.
+- `pine_tree_geometry.py` — builders for pine-style tree geometry: trunk, stacked foliage cones, base.
+- `tree_materials.py` — simple lambert shader creation and assignment helpers for tree parts.
 
 ---
 
@@ -57,7 +71,14 @@ The function returns a dictionary describing the created scene nodes.
 - build_landscape()
     - Coordinates terrain and tree creation to produce a simple test scene.
     - Returns: dict with keys `terrain`, `oak`, `pine`. `terrain` is the terrain transform name. `oak` and `pine` are nested dicts describing created parts.
-    - Behavior: Creates a terrain (via `terrain_generator.create_terrain`), an oak tree (trunk, branches, leaves, base), and a pine tree (trunk, stacked foliage cones, base). Assigns materials using the material helpers.
+    - Behavior: Creates a terrain (via `terrain_generator.create_terrain`), an oak tree (trunk, leaves, base), and a pine tree (trunk, stacked foliage cones, base). Assigns materials using the material helpers.
+
+### How it works (data-driven)
+
+- SCENE_CONFIG (in `main.py`) is a list of dictionaries describing scene elements. Each dictionary must include a `type` key (e.g. `"terrain"`, `"oak"`, `"pine"`) and any parameters to pass to that element's builder (these parameters match the builder function signatures).
+- `BUILDERS` is a dictionary mapping the `type` string to a builder callable. `create_element(data)` looks up the builder by `data['type']`, strips the `type` key, and calls the builder using `**params`.
+- `create_element` validates the input, warns on missing or unknown types, and returns `None` on failure. Builders are wrapped defensively so they return `None` instead of raising when Maya is unavailable or parameters are bad.
+- `build_scene()` iterates `SCENE_CONFIG`, calls `create_element()` for each entry, and returns a list of results. Adding an object to the scene is just adding a dictionary to `SCENE_CONFIG` — no code changes required.
 
 ### terrain_generator.py
 
@@ -74,6 +95,8 @@ The function returns a dictionary describing the created scene nodes.
         - seed (int): Random seed used by the `PerlinNoise` instance for deterministic results.
         - name (str): Name for the created plane transform.
     - Returns: The transform node name of the created plane (string).
+
+Notes: The function uses `cmds.polyEvaluate(..., vertex=True)` and iterates every vertex to call `cmds.pointPosition` and `cmds.xform` to displace vertices.
 
 ### terrain_materials.py
 
@@ -95,24 +118,16 @@ The function returns a dictionary describing the created scene nodes.
 
 ### oak_tree_geometry.py
 
-- create_trunk(width=1, height=5) -> str
+create_trunk(width=1, height=5) -> str
     - Builds a `polyCylinder`, moves it to sit on the ground (translates by height/2) and returns its transform name.
     - Parameters:
         - width (float): Diameter of the trunk.
         - height (float): Height of the trunk.
 
-- create_branches(count=5, spread=3, trunk_height=5) -> list[str]
-    - Creates `count` short cylinders rotated and moved to simulate branches fanning out from the top of the trunk.
+create_leaves(density=20, style='round', spread=2.5, trunk_height=5) -> list[str]
+    - Creates `density` poly spheres or small mesh clusters scattered around the treetop to emulate a leafy canopy.
     - Parameters:
-        - count (int): Number of branches to create.
-        - spread (float): Length/height of each branch cylinder.
-        - trunk_height (float): Y position to place the branches (usually trunk height).
-    - Returns: List of branch transform node names.
-
-- create_leaves(density=20, style='round', spread=2.5, trunk_height=5) -> list[str]
-    - Creates `density` poly spheres scattered around treetop to emulate a leafy canopy.
-    - Parameters:
-        - density (int): Number of leaf spheres.
+        - density (int): Number of leaf elements.
         - style (str): `'round'` (default) or `'pointy'` — the latter scales spheres vertically to appear pointier.
         - spread (float): Scatter radius for foliage placement.
         - trunk_height (float): Base Y position for foliage.
@@ -157,6 +172,14 @@ The function returns a dictionary describing the created scene nodes.
     - Returns: Shading group node name used for the assignment.
 
 ---
+
+## What I Learned
+
+Before this class, I had never used Maya or done any Python scripting for digital content creation, so there was definitely a learning curve. The hardest part of the project was figuring out how Maya's commands worked and understanding how to create and manipulate geometry through code instead of through the Maya interface. I spent a lot of time debugging issues related to object creation, positioning, and material assignment while learning the Maya API.
+
+One thing I learned is that good project organization becomes much more important as a program grows. Separating the terrain, tree geometry, materials, and scene-building logic into different modules made the code much easier to maintain and expand. I also gained experience with procedural generation and learned how parameters and noise functions can be used to create more natural-looking landscapes.
+
+If I continued working on this project, I could improve the user experience by adding a full Maya UI and support for saving and loading configurations through JSON files. I would also add more landscape features, such as additional tree types, rocks, water, and other environmental objects to make the generated scenes feel more varied and realistic. Overall, the project gave me a good introduction to Maya scripting and showed me how programming can be used as a tool for creating digital content.
 
 ## Author
 
