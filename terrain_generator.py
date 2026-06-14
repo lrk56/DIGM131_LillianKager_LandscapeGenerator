@@ -14,7 +14,6 @@ from demo_perlin import PerlinNoise
 #DEBUG flag - when True, builder functions will print parameters and errors
 DEBUG = False
 
-
 def create_terrain(
     plane_size=20,
     subdivs=50,
