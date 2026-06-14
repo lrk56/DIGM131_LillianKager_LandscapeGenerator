@@ -40,17 +40,39 @@ This README documents every public function in the project, their parameters and
 ## Quick start (inside Maya)
 
 1. Open Autodesk Maya.
-2. Make sure the folder containing this project is on Maya's Python path, or copy the files into your Maya scripts folder.
-3. Open the Script Editor and run / source `main.py` or call `build_landscape()` from the Python tab.
+2. Open the Script Editor.
+3. In the Python tab, paste and run the following:
 
-Example (Python tab):
+import maya.cmds as cmds
+cmds.file(new=True, force=True)
 
-```python
-from main import build_landscape
-scene = build_landscape()
-```
+import importlib
+import sys
+import os
 
-The function returns a dictionary describing created scene nodes.
+project_path = 'YOUR/PATH/TO/PROJECT/FOLDER'
+if project_path not in sys.path:
+    sys.path.insert(0, project_path)
+
+import demo_perlin, terrain_generator, terrain_materials
+import tree_materials, oak_tree_geometry, pine_tree_geometry
+import main, landscape_ui
+
+importlib.reload(demo_perlin)
+importlib.reload(terrain_generator)
+importlib.reload(terrain_materials)
+importlib.reload(tree_materials)
+importlib.reload(oak_tree_geometry)
+importlib.reload(pine_tree_geometry)
+importlib.reload(main)
+importlib.reload(landscape_ui)
+
+landscape_ui.build_ui()
+
+4. Replace `YOUR/PATH/TO/PROJECT/FOLDER` with the actual path to the project on your machine.
+5. The Landscape Generator window will open. Adjust the sliders and click **Build Scene**.
+
+> **Note:** I recommend running this block every time you reopen Maya or make changes to any of the project files. The `importlib.reload` calls make sure that Maya picks up the latest code instead of an old version. You can also copy all the project files directly into your Maya scripts folder and just run `import landscape_ui; landscape_ui.build_ui()`, but this means manually copying files every time you make a change, and I have had some issues with it so it's not as good of a solution. 
 
 ---
 
