@@ -157,10 +157,12 @@ def build_scene(config_list=None):
             if t == 'terrain':
                 assign_terrain_material(res['terrain'], create_terrain_material(entry.get('preset', 'grass')))
             elif t in ('oak', 'pine'):
-                mat = create_material(color=(0.3, 0.5, 0.15))
+                leaf_mat = create_material(color=(0.2, 0.6, 0.2))
+                bark_mat = create_material(color=(0.35, 0.2, 0.08))
                 for key, p in res.items():
                     if key == 'type':
                         continue
+                    mat = bark_mat if key in ('trunk', 'base') else leaf_mat
                     if isinstance(p, list):
                         for i in p:
                             assign_material(i, mat)
