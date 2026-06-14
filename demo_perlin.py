@@ -49,34 +49,22 @@ class PerlinNoise:
 
 
 if __name__ == "__main__":
-    # Settings
+    #Settings
     subdivs = 50
     plane_size = 20
     noise_scale = 0.15  # controls feature size (lower = broader hills)
     height_scale = 5.0  # max displacement height
 
-    # Create the plane
+    #Create the plane
     terrain = cmds.polyPlane(
         w=plane_size, h=plane_size,
         sx=subdivs, sy=subdivs,
         name='terrain'
     )[0]
-#Settings
-subdivs = 50
-plane_size = 20
-noise_scale = 0.15  # controls feature size (lower = broader hills)
-height_scale = 5.0  # max displacement height
-
-#Create the plane
-terrain = cmds.polyPlane(
-    w=plane_size, h=plane_size,
-    sx=subdivs, sy=subdivs,
-    name='terrain'
-)[0]
 
     perlin = PerlinNoise(seed=42)
 
-    # Displace each vertex along Y
+    #Displace each vertex along Y
     num_verts = cmds.polyEvaluate(terrain, vertex=True)
     for i in range(num_verts):
         vtx = '{}.vtx[{}]'.format(terrain, i)
@@ -84,11 +72,3 @@ terrain = cmds.polyPlane(
         h = perlin.fractal(pos[0] * noise_scale, pos[2] * noise_scale,
                            octaves=4, persistence=0.5)
         cmds.xform(vtx, worldSpace=True, translation=[pos[0], h * height_scale, pos[2]])
-#Displace each vertex along Y
-num_verts = cmds.polyEvaluate(terrain, vertex=True)
-for i in range(num_verts):
-    vtx = '{}.vtx[{}]'.format(terrain, i)
-    pos = cmds.pointPosition(vtx, world=True)
-    h = perlin.fractal(pos[0] * noise_scale, pos[2] * noise_scale,
-                       octaves=4, persistence=0.5)
-    cmds.xform(vtx, worldSpace=True, translation=[pos[0], h * height_scale, pos[2]])
