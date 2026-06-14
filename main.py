@@ -6,6 +6,7 @@ and produce a full test scene in the viewport.
 #This file wires everything up and runs the demo scene
 import sys
 import os
+import random
 
 #add the project directory to sys.path so all local modules can be found
 sys.path.insert(0, os.path.dirname(__file__))
@@ -47,12 +48,22 @@ def _build_terrain_element(**params):
 
 
 def _build_oak_element(**params):
-    #oak is composed of trunk, leaves, base
     try:
         height = params.get('height', 5)
         trunk = oak_trunk(width=params.get('width', 1), height=height)
         leaves = oak_leaves(density=params.get('density', 20), style=params.get('style', 'round'), spread=params.get('spread', 2.5), trunk_height=height)
         base = oak_base(depth=params.get('depth', 1.5), radius=params.get('radius', 1.8))
+
+        plane_size = params.get('plane_size', 40)
+        limit = plane_size / 2 * 0.85
+        x = random.uniform(-limit, limit)
+        z = random.uniform(-limit, limit)
+        import maya.cmds as cmds
+        for node in [trunk, base] + leaves:
+            if node:
+                pos = cmds.xform(node, q=True, ws=True, t=True)
+                cmds.move(pos[0] + x, pos[1], pos[2] + z, node, ws=True)
+
         return {"type": "oak", "trunk": trunk, "leaves": leaves, "base": base}
     except TypeError as te:
         if DEBUG:
@@ -63,13 +74,23 @@ def _build_oak_element(**params):
             print("_build_oak_element failed:", e)
         return None
 
-
 def _build_pine_element(**params):
     try:
         height = params.get('height', 7)
         trunk = pine_trunk(width=params.get('width', 0.4), height=height)
         foliage = pine_foliage(tiers=params.get('tiers', 5), base_radius=params.get('base_radius', 2.5), trunk_height=height)
         base = pine_base(depth=params.get('depth', 1.0), radius=params.get('radius', 0.8))
+
+        plane_size = params.get('plane_size', 40)
+        limit = plane_size / 2 * 0.85
+        x = random.uniform(-limit, limit)
+        z = random.uniform(-limit, limit)
+        import maya.cmds as cmds
+        for node in [trunk, base] + foliage:
+            if node:
+                pos = cmds.xform(node, q=True, ws=True, t=True)
+                cmds.move(pos[0] + x, pos[1], pos[2] + z, node, ws=True)
+
         return {"type": "pine", "trunk": trunk, "foliage": foliage, "base": base}
     except TypeError as te:
         if DEBUG:
@@ -131,6 +152,20 @@ def build_scene(config_list=None):
         if DEBUG:
             print(f"build_scene: creating element {i}:", entry)
         res = create_element(entry)
+        if res is not None:
+            t = entry.get('type')
+            if t == 'terrain':
+                assign_terrain_material(res['terrain'], create_terrain_material(entry.get('preset', 'grass')))
+            elif t in ('oak', 'pine'):
+                mat = create_material(color=(0.3, 0.5, 0.15))
+                for key, p in res.items():
+                    if key == 'type':
+                        continue
+                    if isinstance(p, list):
+                        for i in p:
+                            assign_material(i, mat)
+                    else:
+                        assign_material(p, mat)
         results.append(res)
     return results
 
