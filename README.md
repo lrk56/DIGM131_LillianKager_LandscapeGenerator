@@ -72,7 +72,9 @@ landscape_ui.build_ui()
 4. Replace `YOUR/PATH/TO/PROJECT/FOLDER` with the actual path to the project on your machine.
 5. The Landscape Generator window will open. Adjust the sliders and click **Build Scene**.
 
-> **Note:** I recommend running this block every time you reopen Maya or make changes to any of the project files. The `importlib.reload` calls make sure that Maya picks up the latest code instead of an old version. You can also copy all the project files directly into your Maya scripts folder and just run `import landscape_ui; landscape_ui.build_ui()`, but this means manually copying files every time you make a change, and I have had some issues with it so it's not as good of a solution. 
+> **Note:** I recommend running this block every time you reopen Maya or make changes to any of the project files. The `importlib.reload` calls make sure that Maya picks up the latest code instead of an old version. You can also copy all the project files directly into your Maya scripts folder and just run `import landscape_ui; landscape_ui.build_ui()`, but this means manually copying files every time you make a change, and I have had some issues with it so it's not as good of a solution.
+
+## Demo Video: https://1drv.ms/v/c/38b18d47ef2fc4af/IQDV-XAN7R2oSbte37-1DgOsAXa0sCIcjSDn96DRc6AffS4?e=wUoO64
 
 ---
 
