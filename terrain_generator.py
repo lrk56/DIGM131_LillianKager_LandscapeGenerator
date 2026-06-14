@@ -9,10 +9,8 @@ import os
 
 #add the current directory to sys.path so demo_perlin can be found
 sys.path.insert(0, os.path.dirname(__file__))
-
 import maya.cmds as cmds
 from demo_perlin import PerlinNoise
-
 #DEBUG flag - when True, builder functions will print parameters and errors
 DEBUG = False
 
@@ -26,8 +24,7 @@ def create_terrain(
     persistence=0.5,
     lacunarity=2.0,
     seed=42,
-    name='terrain'
-):
+    name='terrain'):
     """
     Creates a displaced terrain mesh in the Maya viewport using Perlin fractal noise.
 
@@ -54,17 +51,17 @@ def create_terrain(
         subdivs = 50
 
     try:
-    #create the base plane
+        #create the base plane
         terrain = cmds.polyPlane(
             w=plane_size, h=plane_size,
             sx=subdivs, sy=subdivs,
             name=name
         )[0]
 
-    #make perlin instance for displacement
+        #make perlin instance for displacement
         perlin = PerlinNoise(seed=seed)
 
-    #displace each vertex along Y using fractal noise, one by one
+        #displace each vertex along Y using fractal noise, one by one
         num_verts = cmds.polyEvaluate(terrain, vertex=True)
         for i in range(num_verts):
             vtx = '{}.vtx[{}]'.format(terrain, i)
