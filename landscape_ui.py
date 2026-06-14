@@ -263,7 +263,8 @@ def build_ui():
     #BUTTONS
     cmds.separator(h=10, style="in")
     cmds.rowLayout(numberOfColumns=2, columnWidth2=(200, 200),
-                   columnAttach=[("both", 6)], columnAlign=[(1, "center"), (2, "center")])
+               columnAttach=[(1, "both", 6), (2, "both", 6)],
+               columnAlign=[(1, "center"), (2, "center")])
     cmds.button(label="Build Scene", h=36,
                 backgroundColor=(0.25, 0.55, 0.25),
                 command=on_build_clicked)
